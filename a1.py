@@ -5,7 +5,9 @@ from sklearn.preprocessing import StandardScaler
 from tensorflow.keras.models import Model 
 from tensorflow.keras.layers import Input, Conv2D, MaxPooling2D, Flatten, LSTM, Dense, Dropout, TimeDistributed, Reshape
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
-
+import matplotlib
+matplotlib.use('TkAgg')  # 或 Qt5Agg、macOSX
+import matplotlib.pyplot as plt
 # 1. 数据加载与维度修正
 def load_data(mat_path):
     mat = sio.loadmat(mat_path)
@@ -95,7 +97,7 @@ if __name__ == "__main__":
     # 参数
     mat_path = 'data.mat'
     batch_size = 16
-    epochs = 50
+    epochs = 100
     
     # 加载数据
     x_train, y_train, x_test = load_data(mat_path)
@@ -130,7 +132,26 @@ if __name__ == "__main__":
         batch_size=batch_size,
         callbacks=callbacks
     )
-    
+
+    plt.figure(figsize=(12, 5))
+plt.subplot(1, 2, 1)
+plt.plot(history.history['accuracy'], label='Train Accuracy')
+plt.plot(history.history['val_accuracy'], label='Validation Accuracy')
+plt.title('Accuracy Curves')
+plt.xlabel('Epoch')
+plt.ylim([0, 1])
+plt.grid(True)
+
+plt.subplot(1, 2, 2)
+plt.plot(history.history['loss'], label='Train Loss')
+plt.plot(history.history['val_loss'], label='Validation Loss')
+plt.title('Loss Curves')
+plt.xlabel('Epoch')
+plt.grid(True)
+
+plt.tight_layout()
+plt.savefig('training_curves.png')  # 保存图像
+plt.show()  # 尝试显示窗口
     # 预测测试集
-    y_pred = (model.predict(x_test) > 0.5).astype(int)
-    print("测试集预测结果:", y_pred.flatten())
+y_pred = (model.predict(x_test) > 0.5).astype(int)
+print("测试集预测结果:", y_pred.flatten())
